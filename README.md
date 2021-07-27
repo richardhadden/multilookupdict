@@ -14,25 +14,25 @@ Implemented as two dicts:
 
 Externally, all keys (canonical and alias) are treated identically,
 and all refer to the same value, unless:
-    - a key is reassigned individually with a new value using `__setitem__`
-    - a key is reassigned to another value using `map_key`
+- a key is reassigned individually with a new value using `__setitem__`
+- a key is reassigned to another value using `map_key`
 
-    ...
+...
 
-    Methods
-    -------
+Methods
+-------
 
-    __setitem__
-        Sets a key to the value. If a (non-string) iterable is provided
-        as key, each key will be assigned the value.
-    __getitem__
-        [As with standard Python dict]
-    map_key
-        Assign the value of one key to another key. Both keys
-        now point to the same value.
-    keys
-        Returns all keys in MultiLookupDict. Returned keys refer to same or different objects.
-    all_keys
-        [Same as `keys`]
-    values
-        [Same as `values`]
+`__setitem__`
+    Sets a key to the value. If a (non-string) iterable is provided
+    as key, each key will be assigned the value.
+`__getitem__`
+    [As with standard Python `dict`]
+`map_key`
+    Assign the value of one key to another key. Both keys
+    now point to the same value.
+`keys`
+    Returns all keys in MultiLookupDict. Returned keys refer to same or different objects.
+`all_keys`
+    [Same as `keys`]
+`values`
+    [Same as `values`]
