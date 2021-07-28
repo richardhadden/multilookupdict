@@ -20,7 +20,7 @@ TODO:  implementation of standard dict methods:
     ✅ keys 
     ✅ popitem 
     - setdefault
-    - update
+    ✅ update
     ✅ values
 
 """
