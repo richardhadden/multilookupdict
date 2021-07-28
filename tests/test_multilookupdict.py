@@ -296,3 +296,18 @@ def test_update():
     assert d["thing2"] == "updated"
     assert d["thing3"] == "updated3"
     assert d["new_key"] == "new_key_value"
+
+
+def test_breaking_it_again():
+    d = MultiLookupDict()
+    d["thing1"] = "thong"
+    d.map_key("thing1", "thing2")
+
+    assert d["thing2"] == "thong"
+
+    d["thing3"] = "other"
+    d.map_key("thing3", "thing2")
+
+    assert d["thing2"] == "other"
+
+    assert d["thing1"] == "thong"

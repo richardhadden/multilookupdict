@@ -41,9 +41,7 @@ class MultiLookupDict:
           (Canonical keys are mapped to themselves in this dict)
 
     Externally, all keys (canonical and alias) are treated identically,
-    and all refer to the same value, unless:
-        - a key is reassigned individually with a new value using `__setitem__` <--- THIS IS WRONG; if set, it should update ALL OF THEM
-        - a key is reassigned to another value using `map_key`
+    and all refer to the same value, unless a key is reassigned to another value using `map_key`
 
     ...
 
