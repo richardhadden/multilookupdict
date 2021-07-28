@@ -250,3 +250,8 @@ def test_popitem():
     assert popped == (("thing3", "thing4"), "thong3")
     assert "thing3" not in d
     assert "thing4" not in d
+
+    popped = d.popitem()
+    assert popped == (("thing1", "thing2"), "thong1")
+    assert "thing1" not in d
+    assert "thing2" not in d
