@@ -15,8 +15,6 @@ Externally, all keys (canonical and alias) are treated identically,
 and all refer to the same value, unless a key is reassigned individually with a new value using `__setitem__`
 
 
-
-
 Methods
 -------
 

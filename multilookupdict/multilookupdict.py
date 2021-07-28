@@ -1,8 +1,10 @@
 from collections import defaultdict
 from collections.abc import Sequence, KeysView, ValuesView
+from __future__ import annotations
+from typing import Any, DefaultDict, Dict, Generator, Hashable, ItemsView, Union, Tuple
 
 
-def _is_sequence(val):
+def _is_sequence(val: Any) -> bool:
     return (isinstance(val, Sequence) and not isinstance(val, str)) or isinstance(
         val, (KeysView, ValuesView)
     )
@@ -64,20 +66,20 @@ class MultiLookupDict:
         [Same as `values`]
     """
 
-    def __init__(self, values={}):
-        self._data = {}
-        self._key_to_canonical_map = {}
+    def __init__(self, values: Dict = {}) -> None:
+        self._data: Dict = {}
+        self._key_to_canonical_map: Dict = {}
         for keys, value in values.items():
             self.__setitem__(keys, value)
 
-    def _set_single_name_and_value(self, key, value):
+    def _set_single_name_and_value(self, key: Hashable, value: Any) -> None:
         """Sets a single key and value."""
         if key not in self._key_to_canonical_map:
             self._key_to_canonical_map[key] = key
 
         self._data[self._key_to_canonical_map[key]] = value
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value) -> None:
         if _is_sequence(key):
             self._set_single_name_and_value(key[0], value)
             for k in key[1:]:
@@ -85,30 +87,30 @@ class MultiLookupDict:
         else:
             self._set_single_name_and_value(key, value)
 
-    def __getitem__(self, name):
+    def __getitem__(self, name: Hashable) -> Any:
         try:
             return self._data[self._key_to_canonical_map[name]]
         except KeyError:
             raise KeyError(f"Key '{name}' not found")
 
-    def __contains__(self, name):
+    def __contains__(self, name: Hashable):
         return name in self._key_to_canonical_map
 
-    def _get_all_keys_from_canonical(self, canonical_key):
+    def _get_all_keys_from_canonical(self, canonical_key: Hashable):
         return [
             key
             for key, value in self._key_to_canonical_map.items()
             if value == canonical_key
         ]
 
-    def _canonical_to_all_keys_map(self):
+    def _canonical_to_all_keys_map(self) -> DefaultDict:
         """Gets all keys associated with a canonical key"""
         key_map = defaultdict(list)
         for ref, can in self._key_to_canonical_map.items():
             key_map[can].append(ref)
         return key_map
 
-    def map_key(self, existing_key, new_key):
+    def map_key(self, existing_key: Hashable, new_key: Hashable) -> None:
         """Assigns the value of an existing key to another key."""
 
         if existing_key not in self._key_to_canonical_map:
@@ -116,49 +118,51 @@ class MultiLookupDict:
 
         self._key_to_canonical_map[new_key] = self._key_to_canonical_map[existing_key]
 
-    def keys(self):
-        return self._all_keys()
+    def keys(self) -> KeysView:
+        return self.all_keys()
 
-    def all_keys(self):
+    def all_keys(self) -> KeysView:
         return self._key_to_canonical_map.keys()
 
-    def canonical_keys(self):
+    def canonical_keys(self) -> KeysView:
         """This is a nonsense! They might have escaped from under us!"""
         return self._data.keys()
 
-    def __iter__(self):
+    def __iter__(self) -> Generator:
         yield from self.keys()
 
-    def items_with_canonical_keys(self):
+    def items_with_canonical_keys(self) -> ItemsView:
         return self._data.items()
 
-    def items(self):
+    def items(self) -> Generator:
         key_map = self._canonical_to_all_keys_map()
         for canonical_key, value in self._data.items():
             yield key_map[canonical_key], value
 
-    def values(self):
+    def values(self) -> ValuesView:
         return self._data.values()
 
-    def _remove_from_canonical_map_by_canonical_key(self, canonical_key):
+    def _remove_from_canonical_map_by_canonical_key(
+        self, canonical_key: Hashable
+    ) -> None:
         self._key_to_canonical_map = {
             k: v for k, v in self._key_to_canonical_map.items() if v != canonical_key
         }
 
-    def pop(self, key):
+    def pop(self, key: Hashable) -> Any:
         canonical_key = self._key_to_canonical_map[key]
         self._remove_from_canonical_map_by_canonical_key(canonical_key)
         return self._data.pop(canonical_key)
 
-    def __delitem__(self, key):
+    def __delitem__(self, key: Hashable) -> None:
         # Use same implementation as pop, just don't return the value
         self.pop(key)
 
-    def clear(self):
+    def clear(self) -> None:
         self._data = {}
         self._key_to_canonical_map = {}
 
-    def popitem(self):
+    def popitem(self) -> Tuple[Tuple, Any]:
         popped_key, popped_data = self._data.popitem()
 
         all_keys = self._get_all_keys_from_canonical(popped_key)
@@ -166,14 +170,14 @@ class MultiLookupDict:
 
         return tuple(all_keys), popped_data
 
-    def get(self, key, value=None):
+    def get(self, key, value=None) -> Union[Any, None]:
         try:
             return self.__getitem__(key)
         except KeyError:
             return value
 
-    def copy(self):
-        new_instance = __class__()
+    def copy(self) -> MultiLookupDict:
+        new_instance = self.__class__()
         new_instance._data = self._data.copy()
         new_instance._key_to_canonical_map = self._key_to_canonical_map.copy()
         return new_instance
@@ -183,9 +187,10 @@ class MultiLookupDict:
         in a multi-lookup dict."""
 
         raise NotImplementedError(
-            f"{__class__.__name__} does not implement fromkeys method."
+            f"{self.__class__.__name__} does not implement fromkeys method."
         )
 
     def update(self, values):
+        # TEST THIS PROPERLY WITH DIFFERENT TYPES
         for key, value in values.items():
             self.__setitem__(key, value)
