@@ -12,9 +12,8 @@ Implemented as two dicts:
 - `MultiLookupDict._key_to_canonical_map` maps 'alias keys' onto canonical keys. (Canonical keys are mapped to themselves in this dict)
 
 Externally, all keys (canonical and alias) are treated identically,
-and all refer to the same value, unless:
-- a key is reassigned individually with a new value using `__setitem__`
-- a key is reassigned to another value using `map_key`
+and all refer to the same value, unless a key is reassigned individually with a new value using `__setitem__`
+
 
 
 
