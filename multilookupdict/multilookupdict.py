@@ -13,12 +13,12 @@ TODO:  implementation of standard dict methods:
     ✅ pop
     ✅ del
     ✅ clear
-    - copy
-    - fromkeys 
-    - get 
+    ✅ copy
+    ✅ fromkeys 
+    ✅ get 
     ✅ items
     ✅ keys 
-    - popitem 
+    ✅ popitem 
     - setdefault
     - update
     ✅ values
@@ -42,7 +42,7 @@ class MultiLookupDict:
 
     Externally, all keys (canonical and alias) are treated identically,
     and all refer to the same value, unless:
-        - a key is reassigned individually with a new value using `__setitem__`
+        - a key is reassigned individually with a new value using `__setitem__` <--- THIS IS WRONG; if set, it should update ALL OF THEM
         - a key is reassigned to another value using `map_key`
 
     ...
@@ -167,3 +167,27 @@ class MultiLookupDict:
         self._remove_from_canonical_map_by_canonical_key(popped_key)
 
         return tuple(all_keys), popped_data
+
+    def get(self, key, value=None):
+        try:
+            return self.__getitem__(key)
+        except KeyError:
+            return value
+
+    def copy(self):
+        new_instance = __class__()
+        new_instance._data = self._data.copy()
+        new_instance._key_to_canonical_map = self._key_to_canonical_map.copy()
+        return new_instance
+
+    def fromkeys(self, *args):
+        """It seems beyond confusing to figure out the semantics of this method
+        in a multi-lookup dict."""
+
+        raise NotImplementedError(
+            f"{__class__.__name__} does not implement fromkeys method."
+        )
+
+    def update(self, values):
+        for key, value in values.items():
+            self.__setitem__(key, value)

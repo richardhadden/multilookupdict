@@ -190,6 +190,9 @@ def test_it_does_not_break():
     assert d["thing2"] == "value1"
     assert d["thing3"] == "value23"
 
+    d["thing2"] = "somethingelse"
+    assert d["thing1"] == "somethingelse"
+
 
 def test_pop():
     d = MultiLookupDict()
@@ -255,3 +258,41 @@ def test_popitem():
     assert popped == (("thing1", "thing2"), "thong1")
     assert "thing1" not in d
     assert "thing2" not in d
+
+
+def test_get():
+    d = MultiLookupDict()
+    d["thing1"] = "thong"
+    d.map_key("thing1", "thing2")
+
+    assert d.get("thing1") == "thong"
+    assert d.get("thing2") == "thong"
+    assert d.get("not there") is None
+    assert d.get("not there", "default value") == "default value"
+
+
+def test_copy():
+    class Thing:
+        pass
+
+    d = MultiLookupDict()
+    t = Thing()
+    d["thing1"] = t
+
+    e = d.copy()
+    assert e["thing1"] is t
+
+
+def test_update():
+    d = MultiLookupDict()
+
+    d["thing1"] = "thong"
+    d.map_key("thing1", "thing2")
+    d["thing3"] = "thong3"
+
+    d.update({"thing2": "updated", "thing3": "updated3", "new_key": "new_key_value"})
+
+    assert d["thing1"] == "updated"
+    assert d["thing2"] == "updated"
+    assert d["thing3"] == "updated3"
+    assert d["new_key"] == "new_key_value"
