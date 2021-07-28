@@ -10,15 +10,14 @@ def _is_sequence(val):
 
 """
 TODO:  implementation of standard dict methods:
-    - pop
-    - del
-    - clear
+    ✅ pop
+    ✅ del
+    ✅ clear
     - copy
     - fromkeys 
     - get 
     ✅ items
     ✅ keys 
-    - pop
     - popitem 
     - setdefault
     - update
@@ -97,7 +96,14 @@ class MultiLookupDict:
     def __contains__(self, name):
         return name in self._key_to_canonical_map
 
-    def _canonical_to_all_keys(self):
+    def _get_all_keys_from_canonical(self, canonical_key):
+        return [
+            key
+            for key, value in self._key_to_canonical_map.items()
+            if value == canonical_key
+        ]
+
+    def _canonical_to_all_keys_map(self):
         """Gets all keys associated with a canonical key"""
         key_map = defaultdict(list)
         for ref, can in self._key_to_canonical_map.items():
@@ -129,9 +135,35 @@ class MultiLookupDict:
         return self._data.items()
 
     def items(self):
-        key_map = self._canonical_to_all_keys()
+        key_map = self._canonical_to_all_keys_map()
         for canonical_key, value in self._data.items():
             yield key_map[canonical_key], value
 
     def values(self):
         return self._data.values()
+
+    def _remove_from_canonical_map_by_canonical_key(self, canonical_key):
+        self._key_to_canonical_map = {
+            k: v for k, v in self._key_to_canonical_map.items() if v != canonical_key
+        }
+
+    def pop(self, key):
+        canonical_key = self._key_to_canonical_map[key]
+        self._remove_from_canonical_map_by_canonical_key(canonical_key)
+        return self._data.pop(canonical_key)
+
+    def __delitem__(self, key):
+        # Use same implementation as pop, just don't return the value
+        self.pop(key)
+
+    def clear(self):
+        self._data = {}
+        self._key_to_canonical_map = {}
+
+    def popitem(self):
+        popped_key, popped_data = self._data.popitem()
+
+        all_keys = self._get_all_keys_from_canonical(popped_key)
+        self._remove_from_canonical_map_by_canonical_key(popped_key)
+
+        return tuple(all_keys), popped_data

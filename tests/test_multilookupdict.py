@@ -119,7 +119,7 @@ def test_in():
     assert "something" not in d
 
 
-def test_canonical_to_all_keys():
+def test_canonical_to_all_keys_map():
     d = MultiLookupDict()
     # This func is internal, should reverse the map...
     d["thing1"] = "thong1"
@@ -127,9 +127,18 @@ def test_canonical_to_all_keys():
     d.map_key("thing1", "thing3")
     d.map_key("thing2", "thing4")
 
-    k = d._canonical_to_all_keys()
+    k = d._canonical_to_all_keys_map()
     assert k["thing1"] == ["thing1", "thing3"]
     assert k["thing2"] == ["thing2", "thing4"]
+
+
+def test_get_all_keys_from_canonical():
+    d = MultiLookupDict()
+    d["thing1"] = "thong"
+    d.map_key("thing1", "thing2")
+    d.map_key("thing2", "thing3")
+
+    assert d._get_all_keys_from_canonical("thing1") == ["thing1", "thing2", "thing3"]
 
 
 def test_items_with_all_keys():
@@ -180,3 +189,64 @@ def test_it_does_not_break():
     assert d["thing1"] == "value1"
     assert d["thing2"] == "value1"
     assert d["thing3"] == "value23"
+
+
+def test_pop():
+    d = MultiLookupDict()
+    d["thing1"] = "value1"
+    d.map_key("thing1", "thing2")
+
+    popped = d.pop("thing2")
+    assert popped == "value1"
+
+    assert "thing1" not in d
+    assert "thing2" not in d
+
+    d = MultiLookupDict()
+    d["thing1"] = "value1"
+    d.map_key("thing1", "thing2")
+
+    popped = d.pop("thing1")
+    assert popped == "value1"
+
+    assert "thing1" not in d
+    assert "thing2" not in d
+
+
+def test_del():
+    d = MultiLookupDict()
+    d["thing1"] = "value1"
+    d.map_key("thing1", "thing2")
+
+    del d["thing2"]
+
+    assert "thing1" not in d
+    assert "thing2" not in d
+
+
+def test_clear():
+    d = MultiLookupDict()
+    d["thing1"] = "thong"
+    d.map_key("thing1", "thing2")
+
+    assert d["thing2"] == "thong"
+    assert d["thing1"] == "thong"
+
+    d.clear()
+
+    assert d._key_to_canonical_map == {}
+    assert d._data == {}
+
+
+def test_popitem():
+    d = MultiLookupDict()
+    d["thing1"] = "thong1"
+    d.map_key("thing1", "thing2")
+
+    d["thing3"] = "thong3"
+    d.map_key("thing3", "thing4")
+
+    popped = d.popitem()
+    assert popped == (("thing3", "thing4"), "thong3")
+    assert "thing3" not in d
+    assert "thing4" not in d
