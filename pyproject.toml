@@ -9,7 +9,7 @@ homepage = "https://github.com/richardhadden/multilookupdict"
 repository = "https://github.com/richardhadden/multilookupdict"
 keywords = ["container", "lookup", "multi"]
 classifiers = [
-    "Development Status :: 4 - Beta"
+    "Development Status :: 4 - Beta",
     "Operating System :: OS Independent",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
