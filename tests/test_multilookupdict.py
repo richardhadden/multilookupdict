@@ -215,6 +215,10 @@ def test_pop():
     assert "thing1" not in d
     assert "thing2" not in d
 
+    d = MultiLookupDict()
+    d["thing1"] = "value1"
+    assert d.pop("not there", "some default") == "some default"
+
 
 def test_del():
     d = MultiLookupDict()

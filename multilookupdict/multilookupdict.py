@@ -1,7 +1,20 @@
-from collections import defaultdict
-from collections.abc import Sequence, KeysView, ValuesView
 from __future__ import annotations
-from typing import Any, DefaultDict, Dict, Generator, Hashable, ItemsView, Union, Tuple
+
+from collections import defaultdict, UserDict
+from collections.abc import Sequence, KeysView, ValuesView
+
+from typing import (
+    AbstractSet,
+    Any,
+    DefaultDict,
+    Dict,
+    Generator,
+    List,
+    Hashable,
+    ItemsView,
+    Union,
+    Tuple,
+)
 
 
 def _is_sequence(val: Any) -> bool:
@@ -28,7 +41,7 @@ TODO:  implementation of standard dict methods:
 """
 
 
-class MultiLookupDict:
+class MultiLookupDict(UserDict):
     """
     A Dict-like container that allows multiple keys to address
     the same value.
@@ -134,10 +147,12 @@ class MultiLookupDict:
     def items_with_canonical_keys(self) -> ItemsView:
         return self._data.items()
 
-    def items(self) -> Generator:
+    def items(self) -> List[Tuple[List, Any]]:
         key_map = self._canonical_to_all_keys_map()
-        for canonical_key, value in self._data.items():
-            yield key_map[canonical_key], value
+        return [
+            (key_map[canonical_key], value)
+            for canonical_key, value in self._data.items()
+        ]
 
     def values(self) -> ValuesView:
         return self._data.values()
@@ -149,8 +164,14 @@ class MultiLookupDict:
             k: v for k, v in self._key_to_canonical_map.items() if v != canonical_key
         }
 
-    def pop(self, key: Hashable) -> Any:
-        canonical_key = self._key_to_canonical_map[key]
+    def pop(self, key, default=None) -> Any:
+        try:
+            canonical_key = self._key_to_canonical_map[key]
+        except KeyError:
+            if default:
+                return default
+            else:
+                raise KeyError
         self._remove_from_canonical_map_by_canonical_key(canonical_key)
         return self._data.pop(canonical_key)
 
