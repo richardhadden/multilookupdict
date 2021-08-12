@@ -106,6 +106,9 @@ class MultiLookupDict(UserDict):
         Same as `dict.items`, except key part of tuple is a `set` of keys for the corresponding value
     pop
         Same as `dict.pop`. All keys pointing to value are removed.
+    aliases
+        Returns all aliases of a given key
+
 
     """
 
