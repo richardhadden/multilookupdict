@@ -41,7 +41,7 @@ TODO:  implementation of standard dict methods:
 """
 
 
-class MultiLookupDictKeySet(set):
+class MultiLookupDictKeysView(set):
     def __repr__(self):
         return super().__repr__()
 
@@ -152,10 +152,10 @@ class MultiLookupDict(UserDict):
     def items_with_canonical_keys(self) -> ItemsView:
         return self._data.items()
 
-    def items(self) -> List[Tuple[List, Any]]:
+    def items(self):  # type: ignore
         key_map = self._canonical_to_all_keys_map()
         return [
-            (MultiLookupDictKeySet(key_map[canonical_key]), value)
+            (MultiLookupDictKeysView(key_map[canonical_key]), value)
             for canonical_key, value in self._data.items()
         ]
 

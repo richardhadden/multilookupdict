@@ -2,7 +2,7 @@ import pytest
 
 from multilookupdict import __version__
 from multilookupdict import MultiLookupDict
-from multilookupdict.multilookupdict import _is_sequence, MultiLookupDictKeySet
+from multilookupdict.multilookupdict import _is_sequence, MultiLookupDictKeysView
 
 
 def test_version():
@@ -150,10 +150,10 @@ def test_items_with_all_keys():
     d.map_key("thing2", "thing4")
 
     iter_values = [
-        (MultiLookupDictKeySet(("thing1", "thing3")), "thong1"),
-        (MultiLookupDictKeySet(("thing2", "thing4")), "thong2"),
+        (MultiLookupDictKeysView(("thing1", "thing3")), "thong1"),
+        (MultiLookupDictKeysView(("thing2", "thing4")), "thong2"),
     ]
-
+    print(d.items())
     for i, (keys, value) in enumerate(d.items()):
         assert iter_values[i][0] == keys
         assert iter_values[i][1] == value
