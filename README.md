@@ -2,6 +2,13 @@
 
 A Dict-like container that allows multiple keys to address the same value.
 
+## Installation
+
+`pip install multilookupdict`
+
+
+## Usage
+
 ```python
 >>> d = MultiLookupDict()
 >>> d["a_key"] = "some_value"
@@ -12,7 +19,7 @@ Implemented as two dicts:
     - `MultiLookupDict._data` holds the 'canonical key' and value
     - `MultiLookupDict._key_to_canonical_map` maps 'alias keys' onto canonical keys.
         (Canonical keys are mapped to themselves in this dict)
-        
+
 Externally, all keys (canonical and alias) are treated identically,
 and all refer to the same value, unless a key is reassigned to another value using `map_key`.
 
