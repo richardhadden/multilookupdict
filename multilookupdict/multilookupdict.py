@@ -183,7 +183,7 @@ class MultiLookupDict(UserDict):
         return self.all_keys()
 
     def all_keys(self) -> KeysView:
-        return self._key_to_canonical_map.keys()
+        return MultiLookupDictKeysView(self._key_to_canonical_map.keys())
 
     def canonical_keys(self) -> KeysView:
         """This is a nonsense! They might have escaped from under us!"""
