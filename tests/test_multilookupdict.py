@@ -318,3 +318,32 @@ def test_breaking_it_again():
     assert d["thing2"] == "other"
 
     assert d["thing1"] == "thong"
+
+
+def test_map_multiple_keys():
+    d = MultiLookupDict()
+    d["thing1"] = "thong"
+
+    d.map_key("thing1", ("thing2", "thing3"))
+
+    assert d["thing2"] == "thong"
+
+
+def test_multiple_assignment_to_existing_key():
+    d = MultiLookupDict()
+
+    d["thing1"] = "thong"
+    d.map_key("thing1", ("other_thing", "some_other"))
+
+    d[("thing1", "thing2", "thing3")] = "thong_updated"
+
+    assert d["thing1"] == "thong_updated"
+    assert d["thing2"] == "thong_updated"
+    assert d["thing3"] == "thong_updated"
+    assert d["other_thing"] == "thong_updated"
+    assert d["some_other"] == "thong_updated"
+
+    e = MultiLookupDict()
+    e[("thing1", "thing2")] = "thong"
+    e[("thing2", "thing3")] = "thong_updated"
+    assert e["thing1"] == "thong_updated"

@@ -134,7 +134,13 @@ class MultiLookupDict(UserDict):
         if existing_key not in self._key_to_canonical_map:
             raise KeyError(f"Existing key '{existing_key}' not found")
 
-        self._key_to_canonical_map[new_key] = self._key_to_canonical_map[existing_key]
+        if _is_sequence(new_key):
+            for k in new_key:
+                self._key_to_canonical_map[k] = self._key_to_canonical_map[existing_key]
+        else:
+            self._key_to_canonical_map[new_key] = self._key_to_canonical_map[
+                existing_key
+            ]
 
     def keys(self) -> KeysView:
         return self.all_keys()
