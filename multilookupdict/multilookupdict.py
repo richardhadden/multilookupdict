@@ -41,6 +41,11 @@ TODO:  implementation of standard dict methods:
 """
 
 
+class MultiLookupDictKeySet(set):
+    def __repr__(self):
+        return super().__repr__()
+
+
 class MultiLookupDict(UserDict):
     """
     A Dict-like container that allows multiple keys to address
@@ -150,7 +155,7 @@ class MultiLookupDict(UserDict):
     def items(self) -> List[Tuple[List, Any]]:
         key_map = self._canonical_to_all_keys_map()
         return [
-            (key_map[canonical_key], value)
+            (MultiLookupDictKeySet(key_map[canonical_key]), value)
             for canonical_key, value in self._data.items()
         ]
 
