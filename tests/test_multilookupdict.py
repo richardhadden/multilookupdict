@@ -1,3 +1,5 @@
+from collections import Counter
+
 import pytest
 
 from multilookupdict import __version__
@@ -347,3 +349,40 @@ def test_multiple_assignment_to_existing_key():
     e[("thing1", "thing2")] = "thong"
     e[("thing2", "thing3")] = "thong_updated"
     assert e["thing1"] == "thong_updated"
+
+
+def test_getting_multiple_items():
+    d = MultiLookupDict()
+    d["thing1"] = "thong1"
+    d["thing2"] = "thong2"
+    d.map_key("thing1", "duplicated_thing1")
+
+    value_counts = Counter(d[("thing1", "thing2")])
+    assert len(value_counts) == 2  # Check we have two items
+    assert all(v == 1 for v in value_counts.values())  # Check they only appear once
+
+    # Now throw in a duplicate key to make sure we still get only two items
+    value_counts = Counter(d[("thing1", "duplicated_thing1", "thing2")])
+    assert len(value_counts) == 2  # Check we have two items
+    assert all(v == 1 for v in value_counts.values())  # Check they only appear once
+
+
+def test_still_get_items_with_sequence_when_one_key_missing():
+    d = MultiLookupDict()
+    d["thing1"] = "thong1"
+
+    assert d[("thing1", "missing")] == ["thong1"]
+
+    d.map_key("thing1", ("thing1", "missing"))
+
+    assert d[("thing1", "missing")] == ["thong1"]
+
+
+def test_aliases_method():
+    d = MultiLookupDict()
+    d["thing1"] = "thong"
+    d.map_key("thing1", "thing2")
+
+    assert d.aliases("thing1") == ["thing1", "thing2"]
+
+    assert d.aliases("thing1", omit_requested_key=True) == ["thing2"]

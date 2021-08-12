@@ -61,7 +61,27 @@ class MultiLookupDict(UserDict):
           (Canonical keys are mapped to themselves in this dict)
 
     Externally, all keys (canonical and alias) are treated identically,
-    and all refer to the same value, unless a key is reassigned to another value using `map_key`
+    and all refer to the same value, unless a key is reassigned to another value using `map_key`.
+
+
+    Multi-key lookups and assignments
+    ---------------------------------
+
+    Iterables of keys can also be accessed, set, and mapped.
+
+    >>> d = MultiLookupDict()
+    >>> d[("key_a", "key_b", "key_c")] = "some_value"
+    >>> d["key_a"] == "some_value"
+
+    Where items are accessed with multiple keys, all distinct matching values are returned
+    as a list (where multiple keys are requested, the result is always a list, for consistency)
+
+    >>> d["key_d"] = "some_other_value" # Add a distinct value
+    >>> d[("key_a", "key_b", "key_d")] == ["some_value", "some_other_value"]
+
+
+    >>> d.map_key("key_a", ("key_e", "key_f")) # Also do multiple mappings
+
 
     ...
 
@@ -81,7 +101,12 @@ class MultiLookupDict(UserDict):
     all_keys
         [Same as `keys`]
     values
-        [Same as `values`]
+        [Same as `dict.values`]
+    items
+        Same as `dict.items`, except key part of tuple is a `set` of keys for the corresponding value
+    pop
+        Same as `dict.pop`. All keys pointing to value are removed.
+
     """
 
     def __init__(self, values: Dict = {}) -> None:
@@ -105,11 +130,20 @@ class MultiLookupDict(UserDict):
         else:
             self._set_single_name_and_value(key, value)
 
-    def __getitem__(self, name: Hashable) -> Any:
-        try:
-            return self._data[self._key_to_canonical_map[name]]
-        except KeyError:
-            raise KeyError(f"Key '{name}' not found")
+    def __getitem__(self, name: Any) -> Any:
+        if _is_sequence(name):
+            canonical_keys_to_get = {
+                self._key_to_canonical_map[k]
+                for k in name
+                if k in self._key_to_canonical_map
+            }
+            items = [self._data[ck] for ck in canonical_keys_to_get]
+            return items
+        else:
+            try:
+                return self._data[self._key_to_canonical_map[name]]
+            except KeyError:
+                raise KeyError(f"Key '{name}' not found")
 
     def __contains__(self, name: Hashable):
         return name in self._key_to_canonical_map
@@ -128,7 +162,7 @@ class MultiLookupDict(UserDict):
             key_map[can].append(ref)
         return key_map
 
-    def map_key(self, existing_key: Hashable, new_key: Hashable) -> None:
+    def map_key(self, existing_key: Hashable, new_key: Any) -> None:
         """Assigns the value of an existing key to another key."""
 
         if existing_key not in self._key_to_canonical_map:
@@ -226,3 +260,14 @@ class MultiLookupDict(UserDict):
         # TEST THIS PROPERLY WITH DIFFERENT TYPES
         for key, value in values.items():
             self.__setitem__(key, value)
+
+    def aliases(self, key: Hashable, omit_requested_key: bool = False):
+        if _is_sequence(key):
+            raise Exception("Only the aliases of a single key can be found at a time")
+
+        all_aliases = self._get_all_keys_from_canonical(self._key_to_canonical_map[key])
+
+        if omit_requested_key:
+            all_aliases.remove(key)
+
+        return all_aliases
