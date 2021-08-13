@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "multilookupdict"
-version = "0.1.4"
+version = "0.1.5"
 description = "A dict-like container that allows multiple keys to address the same value."
 authors = ["Richard Hadden <richard.hadden@oeaw.ac.at>"]
 license = "MIT"
