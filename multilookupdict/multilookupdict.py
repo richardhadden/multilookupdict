@@ -179,15 +179,11 @@ class MultiLookupDict(UserDict):
                 existing_key
             ]
 
-    def keys(self) -> KeysView:
+    def keys(self):
         return self.all_keys()
 
-    def all_keys(self) -> KeysView:
+    def all_keys(self):
         return MultiLookupDictKeysView(self._key_to_canonical_map.keys())
-
-    def canonical_keys(self) -> KeysView:
-        """This is a nonsense! They might have escaped from under us!"""
-        return self._data.keys()
 
     def __iter__(self) -> Generator:
         yield from self.keys()
@@ -274,3 +270,20 @@ class MultiLookupDict(UserDict):
             all_aliases.remove(key)
 
         return all_aliases
+
+    @staticmethod
+    def _item_repr(item: Tuple) -> str:
+        keys, value = item
+        repr_string = "["
+        repr_string += ", ".join(sorted(keys))
+        repr_string += "]: "
+        repr_string += value.__repr__()
+        return repr_string
+
+    def __repr__(self) -> str:
+        # Just print Items
+        repr_string = f"{self.__class__.__name__}({{ "
+        repr_string += ", ".join(self._item_repr(item) for item in self.items())
+
+        repr_string += " })"
+        return repr_string

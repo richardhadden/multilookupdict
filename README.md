@@ -34,10 +34,10 @@ Iterables of keys can also be accessed, set, and mapped.
 >>> d = MultiLookupDict()
 >>> d[("key_a", "key_b", "key_c")] = "some_value"
 >>> d["key_a"] == "some_value"
-
+```
 Where items are accessed with multiple keys, all distinct matching values are returned
 as a list (where multiple keys are requested, the result is always a list, for consistency)
-
+```python
 >>> d["key_d"] = "some_other_value" # Add a distinct value
 >>> d[("key_a", "key_b", "key_d")] == ["some_value", "some_other_value"]
 
@@ -68,8 +68,8 @@ Methods
     <dd>[Same as <code>dict.values</code>]</dd>
 <dt><code>items()</code></dt>
     <dd>Same as <code>dict.items</code>, except "key" part of the tuple is a <code>set</code> of keys for the corresponding value</dd>
-<dt><code>pop(value?)</code><dd>
+<dt><code>pop(key)</code><dd>
     <dd>Same as <code>dict.pop</code>. All keys pointing to value are removed.</dd>
-<dt><code>aliases</code></dt>
-    <dd>Returns all aliases of a given key</dd>
+<dt><code>aliases(key, omit_requested_key=False)</code></dt>
+    <dd>Returns all aliases of a given key, including the key provided. (Set <code>omit_requested_key</code> to <code>True</code> to exclude the provided key.)</dd>
 </dl>

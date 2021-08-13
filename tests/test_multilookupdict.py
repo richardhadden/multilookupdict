@@ -386,3 +386,23 @@ def test_aliases_method():
     assert d.aliases("thing1") == ["thing1", "thing2"]
 
     assert d.aliases("thing1", omit_requested_key=True) == ["thing2"]
+
+
+def test_repr():
+    d = MultiLookupDict()
+    d["thing1"] = "thong"
+    d.map_key("thing1", "thing2")
+
+    d["other1"] = "othervalue"
+    d.map_key("other1", "other2")
+    assert (
+        d.__repr__()
+        == "MultiLookupDict({ [thing1, thing2]: 'thong', [other1, other2]: 'othervalue' })"
+    )
+
+
+def test_str():
+    d = MultiLookupDict()
+    d["thing1"] = "thong"
+    d.map_key("thing1", "thing2")
+    assert d.__str__() == ""
